@@ -983,7 +983,8 @@ mm_generic_cdma_update_cdma1x_quality (MMGenericCdma *self, guint32 quality)
     priv = MM_GENERIC_CDMA_GET_PRIVATE (self);
     if (priv->cdma1x_quality != quality) {
         priv->cdma1x_quality = quality;
-        mm_modem_cdma_emit_signal_quality_changed (MM_MODEM_CDMA (self), quality);
+        if (priv->evdo_reg_state == MM_MODEM_CDMA_REGISTRATION_STATE_UNKNOWN)
+          mm_modem_cdma_emit_signal_quality_changed (MM_MODEM_CDMA (self), quality);
     }
 }
 
@@ -998,7 +999,8 @@ mm_generic_cdma_update_evdo_quality (MMGenericCdma *self, guint32 quality)
     priv = MM_GENERIC_CDMA_GET_PRIVATE (self);
     if (priv->evdo_quality != quality) {
         priv->evdo_quality = quality;
-        // FIXME: emit a signal
+        if (priv->evdo_reg_state != MM_MODEM_CDMA_REGISTRATION_STATE_UNKNOWN)
+          mm_modem_cdma_emit_signal_quality_changed (MM_MODEM_CDMA (self), quality);
     }
 }
 
