@@ -221,6 +221,15 @@ mm_gsm_destroy_scan_data (gpointer data)
     g_ptr_array_free (results, TRUE);
 }
 
+void
+mm_cdma_destroy_scan_data (gpointer data)
+{
+    GPtrArray *results = (GPtrArray *) data;
+
+    g_ptr_array_foreach (results, (GFunc) g_hash_table_destroy, NULL);
+    g_ptr_array_free (results, TRUE);
+}
+
 /*************************************************************************/
 
 /* +CREG: <stat>                      (GSM 07.07 CREG=1 unsolicited) */

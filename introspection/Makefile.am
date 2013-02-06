@@ -15,6 +15,8 @@ EXTRA_DIST = \
 	org.freedesktop.ModemManager.Modem.Gsm.Hso.xml \
 	org.freedesktop.ModemManager.Modem.Gsm.Network.xml \
 	org.freedesktop.ModemManager.Modem.Gsm.SMS.xml \
+	org.freedesktop.ModemManager.Modem.Cdma.SMS.xml \
+	org.freedesktop.ModemManager.Modem.Cdma.Phone.xml \
 	org.freedesktop.ModemManager.Modem.Gsm.Ussd.xml \
 	org.freedesktop.ModemManager.Modem.Location.xml \
 	org.freedesktop.ModemManager.Modem.Simple.xml \

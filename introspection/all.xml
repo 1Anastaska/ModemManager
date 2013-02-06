@@ -34,6 +34,8 @@
   <xi:include href="org.freedesktop.ModemManager.Modem.Gsm.Hso.xml"/>
   <xi:include href="org.freedesktop.ModemManager.Modem.Gsm.Network.xml"/>
   <xi:include href="org.freedesktop.ModemManager.Modem.Gsm.SMS.xml"/>
+  <xi:include href="org.freedesktop.ModemManager.Modem.Cdma.SMS.xml"/>
+  <xi:include href="org.freedesktop.ModemManager.Modem.Cdma.Phone.xml"/>
   <xi:include href="org.freedesktop.ModemManager.Modem.Gsm.Ussd.xml"/>
   <xi:include href="org.freedesktop.ModemManager.Modem.Firmware.xml"/>
   <xi:include href="org.freedesktop.ModemManager.Modem.Location.xml"/>

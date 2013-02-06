@@ -256,6 +256,23 @@ at_command_to_byte_array (const char *command)
     return buf;
 }
 
+static GByteArray *
+at_command_len_to_byte_array (const char *command, gssize len)
+{
+    GByteArray *buf;
+
+    g_return_val_if_fail (command != NULL, NULL);
+
+    buf = g_byte_array_sized_new (len + 3);
+
+    /* Make sure there's an AT in the front */
+    if (!g_str_has_prefix (command, "AT"))
+        g_byte_array_append (buf, (const guint8 *) "AT", 2);
+    g_byte_array_append (buf, (const guint8 *) command, len);
+
+    return buf;
+}
+
 void
 mm_at_serial_port_queue_command (MMAtSerialPort *self,
                                  const char *command,
@@ -270,6 +287,31 @@ mm_at_serial_port_queue_command (MMAtSerialPort *self,
     g_return_if_fail (command != NULL);
 
     buf = at_command_to_byte_array (command);
+    g_return_if_fail (buf != NULL);
+
+    mm_serial_port_queue_command (MM_SERIAL_PORT (self),
+                                  buf,
+                                  TRUE,
+                                  timeout_seconds,
+                                  (MMSerialResponseFn) callback,
+                                  user_data);
+}
+
+void
+mm_at_serial_port_queue_command_len (MMAtSerialPort *self,
+                                 const char *command,
+								 gssize len,
+                                 guint32 timeout_seconds,
+                                 MMAtSerialResponseFn callback,
+                                 gpointer user_data)
+{
+    GByteArray *buf;
+
+    g_return_if_fail (self != NULL);
+    g_return_if_fail (MM_IS_AT_SERIAL_PORT (self));
+    g_return_if_fail (command != NULL);
+
+    buf = at_command_len_to_byte_array (command, len);
     g_return_if_fail (buf != NULL);
 
     mm_serial_port_queue_command (MM_SERIAL_PORT (self),

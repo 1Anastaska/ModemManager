@@ -31,6 +31,7 @@
 GPtrArray *mm_gsm_parse_scan_response (const char *reply, GError **error);
 
 void mm_gsm_destroy_scan_data (gpointer data);
+void mm_cdma_destroy_scan_data (gpointer data);
 
 GPtrArray *mm_gsm_creg_regex_get (gboolean solicited);
 

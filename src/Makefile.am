@@ -110,10 +110,14 @@ modem_manager_SOURCES = \
 	mm-modem-gsm-network.h \
 	mm-modem-gsm-sms.c \
 	mm-modem-gsm-sms.h \
+	mm-modem-cdma-sms.c \
+	mm-modem-cdma-sms.h \
 	mm-modem-gsm-ussd.c \
 	mm-modem-gsm-ussd.h \
 	mm-modem-simple.c \
 	mm-modem-simple.h \
+	mm-modem-cdma-phone.c \
+	mm-modem-cdma-phone.h \
 	mm-plugin.c \
 	mm-plugin.h \
 	mm-plugin-base.c \
@@ -148,8 +152,14 @@ mm-modem-gsm-network-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemMa
 mm-modem-gsm-sms-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemManager.Modem.Gsm.SMS.xml
 	$(AM_V_GEN) dbus-binding-tool --prefix=mm_modem_gsm_sms --mode=glib-server --output=$@ $<
 
+mm-modem-cdma-sms-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemManager.Modem.Cdma.SMS.xml
+	$(AM_V_GEN) dbus-binding-tool --prefix=mm_modem_cdma_sms --mode=glib-server --output=$@ $<
+
 mm-modem-gsm-ussd-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemManager.Modem.Gsm.Ussd.xml
 	$(AM_V_GEN) dbus-binding-tool --prefix=mm_modem_gsm_ussd --mode=glib-server --output=$@ $<
+
+mm-modem-cdma-phone-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemManager.Modem.Cdma.Phone.xml
+	$(AM_V_GEN) dbus-binding-tool --prefix=mm_modem_cdma_phone --mode=glib-server --output=$@ $<
 
 mm-properties-changed-glue.h: $(top_srcdir)/introspection/org.freedesktop.DBus.Properties.xml
 	$(AM_V_GEN) dbus-binding-tool --prefix=mm_properties_changed --mode=glib-server --output=$@ $<
@@ -162,7 +172,9 @@ BUILT_SOURCES = \
 	mm-modem-gsm-card-glue.h \
 	mm-modem-gsm-network-glue.h \
 	mm-modem-gsm-sms-glue.h \
+	mm-modem-cdma-sms-glue.h \
 	mm-modem-gsm-ussd-glue.h \
+	mm-modem-cdma-phone-glue.h \
 	mm-properties-changed-glue.h
 
 mm-modem-location-glue.h: $(top_srcdir)/introspection/org.freedesktop.ModemManager.Modem.Location.xml

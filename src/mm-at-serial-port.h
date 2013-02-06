@@ -94,6 +94,13 @@ void     mm_at_serial_port_queue_command     (MMAtSerialPort *self,
                                               MMAtSerialResponseFn callback,
                                               gpointer user_data);
 
+void     mm_at_serial_port_queue_command_len  (MMAtSerialPort *self,
+                                              const char *command,
+											  gssize len,
+                                              guint32 timeout_seconds,
+                                              MMAtSerialResponseFn callback,
+                                              gpointer user_data);
+
 void     mm_at_serial_port_queue_command_cached (MMAtSerialPort *self,
                                                  const char *command,
                                                  guint32 timeout_seconds,

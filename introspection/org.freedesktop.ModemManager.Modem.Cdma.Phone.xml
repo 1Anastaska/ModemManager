@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.freedesktop.ModemManager.Modem.Cdma.Phone">
+    <method name="Call">
+      <tp:docstring>
+		  Make a voice call.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_call"/>
+      <arg name="number" type="s" direction="in">
+		  <tp:docstring>
+			  The number for voice call.
+		  </tp:docstring>
+      </arg>
+    </method>
+
+    <method name="Answer">
+      <tp:docstring>
+		  Answer a voice call.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_answer"/>
+    </method>
+
+    <method name="End">
+      <tp:docstring>
+		  End a voice call.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_end"/>
+    </method>
+
+    <method name="SendDTMF">
+      <tp:docstring>
+		  Send DTMF.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_send_dtmf"/>
+	  <arg name="format" type="a{sv}" direction="in"/>
+		<tp:docstring>
+		  id : uint32 - Call ID.
+		  digit : string - DTMF digit.
+		</tp:docstring>
+    </method>
+
+    <method name="GetStatus">
+      <tp:docstring>
+		  Get Status.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_get_status"/>
+      <arg name="status" type="a{sv}" direction="out">
+        <tp:docstring>
+          A dictionary containing Status properties.  This dictionary may contain the following key/value pairs:
+			id : Call ID
+			dir : Call direction
+				0 : MO
+				1 : MT
+			state : Call state
+				0 : Active
+				1 : Held
+				2 : Dialing
+				3 : Alerting
+				4 : Incoming
+				5 : Waiting
+			mode : Call mode
+				0 : voice
+				1 : data
+				2 : fax
+			mpty : Multi phone type
+				0 : enable
+				1 : disable
+			number : Call number
+			type : Call type
+			alpha : Text information
+			priority : Call priority
+        </tp:docstring>
+      </arg>
+    </method>
+
+    <method name="Mute">
+      <tp:docstring>
+		  Mute.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_mute"/>
+      <arg name="mute" type="b" direction="in">
+		  <tp:docstring>
+			  The state of mute.
+		  </tp:docstring>
+      </arg>
+    </method>
+
+    <method name="Clvl">
+      <tp:docstring>
+		  Set call voice level.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_clvl"/>
+      <arg name="level" type="u" direction="in">
+		  <tp:docstring>
+			  The level of call voice.
+		  </tp:docstring>
+      </arg>
+    </method>
+
+    <method name="Cmiclvl">
+      <tp:docstring>
+		  Set mic voice level.
+      </tp:docstring>
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="impl_cdma_modem_phone_cmiclvl"/>
+      <arg name="level" type="u" direction="in">
+		  <tp:docstring>
+			  The level of mic.
+		  </tp:docstring>
+      </arg>
+    </method>
+
+    <signal name="Ring">
+      <tp:docstring>
+        Emitted when any part of a new call has been received.
+      </tp:docstring>
+    </signal>
+
+    <signal name="Clip">
+      <tp:docstring>
+        Emitted when the clip status of an call has been received.
+      </tp:docstring>
+      <arg name="number" type="s">
+        <tp:docstring>
+          The number of the caller.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+    <signal name="Orig">
+      <tp:docstring>
+        Emitted when the call has been created.
+      </tp:docstring>
+      <arg name="id" type="u">
+        <tp:docstring>
+          The id of the call.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+    <signal name="Conn">
+      <tp:docstring>
+        Emitted when the call has been connected.
+      </tp:docstring>
+      <arg name="id" type="u">
+        <tp:docstring>
+          The id of the call.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+    <signal name="Cend">
+      <tp:docstring>
+        Emitted when the call has been ended.
+      </tp:docstring>
+      <arg name="id" type="u">
+        <tp:docstring>
+          The id of the call.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+  </interface>
+</node>
