@@ -354,8 +354,8 @@ real_config_fd (MMSerialPort *self, int fd, GError **error)
     stbuf.c_cc[VEOF] = 1;
 
     /* Use software handshaking and ignore parity/framing errors */
-    stbuf.c_iflag |= (IXON | IXOFF | IXANY | IGNPAR | IGNBRK);
     stbuf.c_lflag = 0;
+    stbuf.c_iflag |= (IXOFF | IXANY | IGNPAR);
 
     /* Set up port speed and serial attributes; also ignore modem control
      * lines since most drivers don't implement RTS/CTS anyway.

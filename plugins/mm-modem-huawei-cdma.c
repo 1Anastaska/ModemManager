@@ -287,68 +287,63 @@ query_registration_state (MMGenericCdma *cdma,
 /*****************************************************************************/
 
 static void
-port_grabbed (MMGenericCdma *cdma,
-              MMPort *port,
-              MMAtPortFlags pflags,
-              gpointer user_data)
+ports_organized (MMGenericCdma *cdma, MMAtSerialPort *port)
 {
     GRegex *regex;
     gboolean evdo0 = FALSE, evdoA = FALSE;
 
-    if (MM_IS_AT_SERIAL_PORT (port)) {
-        g_object_set (G_OBJECT (port), MM_PORT_CARRIER_DETECT, FALSE, NULL);
+    g_object_set (G_OBJECT (port), MM_PORT_CARRIER_DETECT, FALSE, NULL);
 
-        /* 1x signal level */
-        regex = g_regex_new ("\\r\\n\\^RSSILVL:(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, handle_1x_quality_change, cdma, NULL);
-        g_regex_unref (regex);
+    /* 1x signal level */
+    regex = g_regex_new ("\\r\\n\\^RSSILVL:(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, handle_1x_quality_change, cdma, NULL);
+    g_regex_unref (regex);
 
-        g_object_get (G_OBJECT (cdma),
-                      MM_GENERIC_CDMA_EVDO_REV0, &evdo0,
-                      MM_GENERIC_CDMA_EVDO_REVA, &evdoA,
-                      NULL);
+    g_object_get (G_OBJECT (cdma),
+                  MM_GENERIC_CDMA_EVDO_REV0, &evdo0,
+                  MM_GENERIC_CDMA_EVDO_REVA, &evdoA,
+                  NULL);
 
-        if (evdo0 || evdoA) {
-            /* EVDO signal level */
-            regex = g_regex_new ("\\r\\n\\^HRSSILVL:(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-            mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, handle_evdo_quality_change, cdma, NULL);
-            g_regex_unref (regex);
-        }
-
-        /* New SMS */
-        regex = g_regex_new ("\\r\\n\\+CMTI:\"(\\S+)\",(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cmti_received, cdma, NULL);
-        g_regex_unref (regex);
-        regex = g_regex_new ("\\r\\n\\+CDSI: \"(\\S+)\",(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cmti_received, cdma, NULL);
-        g_regex_unref (regex);
-
-        /* Ring */
-        regex = g_regex_new ("\\r\\nRING\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, ring_received, cdma, NULL);
-        g_regex_unref (regex);
-
-        /* CLIP */
-        regex = g_regex_new ("\\r\\n\\+CLIP:(\\S+),(\\d+),,,,(\\d+)\\s*\\r\\n",
-                    G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, clip_received, cdma, NULL);
-        g_regex_unref (regex);
-
-        /* Orig */
-        regex = g_regex_new ("\\r\\n\\^ORIG:(\\d+),(\\d+)\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, orig_received, cdma, NULL);
-        g_regex_unref (regex);
-
-        /* Conn */
-        regex = g_regex_new ("\\r\\n\\^CONN:(\\d+),(\\d+)\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, conn_received, cdma, NULL);
-        g_regex_unref (regex);
- 
-        /* Cend */
-        regex = g_regex_new ("\\r\\n\\^CEND:(\\d+),\\S+\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
-        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cend_received, cdma, NULL);
+    if (evdo0 || evdoA) {
+        /* EVDO signal level */
+        regex = g_regex_new ("\\r\\n\\^HRSSILVL:(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+        mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, handle_evdo_quality_change, cdma, NULL);
         g_regex_unref (regex);
     }
+
+    /* New SMS */
+    regex = g_regex_new ("\\r\\n\\+CMTI:\"(\\S+)\",(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cmti_received, cdma, NULL);
+    g_regex_unref (regex);
+    regex = g_regex_new ("\\r\\n\\+CDSI: \"(\\S+)\",(\\d+)\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cmti_received, cdma, NULL);
+    g_regex_unref (regex);
+
+    /* Ring */
+    regex = g_regex_new ("\\r\\nRING\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, ring_received, cdma, NULL);
+    g_regex_unref (regex);
+
+    /* CLIP */
+    regex = g_regex_new ("\\r\\n\\+CLIP:(\\S+),(\\d+),,,,(\\d+)\\s*\\r\\n",
+                G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, clip_received, cdma, NULL);
+    g_regex_unref (regex);
+
+    /* Orig */
+    regex = g_regex_new ("\\r\\n\\^ORIG:(\\d+),(\\d+)\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, orig_received, cdma, NULL);
+    g_regex_unref (regex);
+
+    /* Conn */
+    regex = g_regex_new ("\\r\\n\\^CONN:(\\d+),(\\d+)\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, conn_received, cdma, NULL);
+    g_regex_unref (regex);
+
+    /* Cend */
+    regex = g_regex_new ("\\r\\n\\^CEND:(\\d+),\\S+\\s*\\r\\n", G_REGEX_RAW | G_REGEX_OPTIMIZE, 0, NULL);
+    mm_at_serial_port_add_unsolicited_msg_handler (MM_AT_SERIAL_PORT (port), regex, cend_received, cdma, NULL);
+    g_regex_unref (regex);
 }
 
 static void
@@ -513,8 +508,7 @@ sms_send (MMModemCdmaSms *modem,
     /* Use 'text' mode */
     mm_at_serial_port_queue_command (port, "AT+CMGF=1", 3, NULL, NULL);
 
-    if(!g_utf8_validate(text, -1, NULL))
-    {
+    if(!g_utf8_validate (text, -1, NULL)) {
         info->error = g_error_new (MM_MODEM_ERROR,
                                    MM_MODEM_ERROR_GENERAL,
                                    "Validates utf8 text string failed!");
@@ -525,38 +519,38 @@ sms_send (MMModemCdmaSms *modem,
     len0 = strlen (text);
     len1 = g_utf8_strlen (text, -1);
 
-    if (len0 == len1) /* ascii */ {
-        gsize l0, l1;
+    if (len0 == len1) { /* ascii */
+        gsize l0 = 0, l1 = 0;
 
         mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,1,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
         /* Max length 160 */
         l0 = (160 > len0) ? len0 : 160;
-        memmove (command+l1, text, l0);
-        memmove (command+l1+l0, "\x1a\x00", 2);
+        memmove (command + l1, text, l0);
+        memmove (command + l1 + l0, "\x1a\x00", 2);
 
         mm_at_serial_port_queue_command (port, command, 10, sms_send_done, info);
-    }
-    else /* unicode */ {
-        gsize l0, l1;
-        gchar *p;
+    } else { /* unicode */
+        gsize l0 = 0, l1 = 0;
+        gchar *p = NULL;
 
         mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,6,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
-        p = g_convert(text, len0, "UCS-2BE", "UTF8", NULL, &l0, &info->error);
-        if(!p) {
+        p = g_convert (text, len0, "UCS-2BE", "UTF8", NULL, &l0, &info->error);
+        if (!p) {
             mm_callback_info_schedule (info);
             return;
         }
         /* Max length 140 */
         l0 = (140 > l0) ? l0 : 140;
-        memmove (command+l1, p, l0);
-        memmove (command+l1+l0, "\x00\x1a", 2);
+        memmove (command + l1, p, l0);
+        memmove (command + l1 + l0, "\x00\x1a", 2);
         g_free (p);
 
-        mm_at_serial_port_queue_command_len (port, command, l1+l0+2, 10, sms_send_done, info);
+        mm_at_serial_port_queue_command_len (port, command, l1 + l0 + 2,
+                    10, sms_send_done, info);
     }
 }
 
@@ -606,20 +600,18 @@ sms_get_done (MMAtSerialPort *port,
     }
 
     /* message text */
-    if (1 == format) /* ascii */ {
-        text = g_malloc0 (length+2);
-        memmove (text, str+offset, length);
-    }
-    else if (6 == format) /* unicode */ {
-        gsize wl;
+    if (1 == format) { /* ascii */
+        text = g_malloc0 (length + 2);
+        memmove (text, str + offset, length);
+    } else if (6 == format) { /* unicode */
+        gsize wl = 0;
 
-        text = g_convert (str+offset, length, "UTF8", "UCS-2BE",
+        text = g_convert (str + offset, length, "UTF8", "UCS-2BE",
                     NULL, &wl, &info->error);
         if (!text)
           goto out;
         length = wl;
-    }
-    else /* other */ {
+    } else { /* other */
         text = NULL;
         length = 0;
     }
@@ -1463,7 +1455,7 @@ mm_modem_huawei_cdma_class_init (MMModemHuaweiCdmaClass *klass)
 
     mm_modem_huawei_cdma_parent_class = g_type_class_peek_parent (klass);
 
-    cdma_class->port_grabbed = port_grabbed;
+    cdma_class->ports_organized = ports_organized;
     cdma_class->query_registration_state = query_registration_state;
 }
 
