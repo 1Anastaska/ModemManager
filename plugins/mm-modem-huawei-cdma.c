@@ -562,7 +562,7 @@ sms_send (MMModemCdmaSms *modem,
     }
 
     /* Use 'text' mode */
-    mm_at_serial_port_queue_command (port, "+CMGF=1", 3, NULL, NULL);
+    mm_at_serial_port_queue_command (port, "AT+CMGF=1", 3, NULL, NULL);
 
     if(!g_utf8_validate (text, -1, NULL)) {
         info->error = g_error_new (MM_MODEM_ERROR,
@@ -578,7 +578,7 @@ sms_send (MMModemCdmaSms *modem,
     if (len0 == len1) { /* ascii */
         gsize l0 = 0, l1 = 0;
 
-        mm_at_serial_port_queue_command (port, "^HSMSSS=0,0,1,0", 3, NULL, NULL);
+        mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,1,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
         /* Max length 160 */
@@ -591,7 +591,7 @@ sms_send (MMModemCdmaSms *modem,
         gsize l0 = 0, l1 = 0;
         gchar *p = NULL;
 
-        mm_at_serial_port_queue_command (port, "^HSMSSS=0,0,6,0", 3, NULL, NULL);
+        mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,6,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
         p = g_convert (text, len0, "UCS-2BE", "UTF8", NULL, &l0, &info->error);
