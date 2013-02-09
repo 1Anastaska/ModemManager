@@ -284,7 +284,63 @@ query_registration_state (MMGenericCdma *cdma,
     mm_at_serial_port_queue_command (port, "^SYSINFO", 3, sysinfo_done, info);
 }
 
+static void
+enable_all_done (MMAtSerialPort *port,
+                 GString *response,
+                 GError *error,
+                 gpointer user_data)
+{
+    MMCallbackInfo *info = (MMCallbackInfo *) user_data;
+
+    /* If the modem has already been removed, return without
+     * scheduling callback */
+    if (mm_callback_info_check_modem_removed (info))
+        return;
+
+    if (error)
+        info->error = g_error_copy (error);
+
+    mm_callback_info_schedule (info);
+}
+
+static void
+post_enable (MMGenericCdma *cdma,
+            MMModemFn callback,
+            gpointer user_data)
+{
+    MMCallbackInfo *info;
+    MMAtSerialPort *port;
+
+    info = mm_callback_info_new (MM_MODEM (cdma), callback, user_data);
+    port = mm_generic_cdma_get_best_at_port (MM_GENERIC_CDMA (cdma), &info->error);
+    if (!port) {
+        mm_callback_info_schedule (info);
+        return;
+    }
+    mm_at_serial_port_queue_command (port, "+IFC=2,2", 3, enable_all_done, info);
+
+    info = mm_callback_info_new (MM_MODEM (cdma), callback, user_data);
+    port = mm_generic_cdma_get_best_at_port (MM_GENERIC_CDMA (cdma), &info->error);
+    if (!port) {
+        mm_callback_info_schedule (info);
+        return;
+    }
+    mm_at_serial_port_queue_command (port, "+CTA=0", 3, enable_all_done, info);
+}
+
 /*****************************************************************************/
+
+static void
+port_grabbed (MMGenericCdma *cdma,
+              MMPort *port,
+              MMAtPortFlags pflags,
+              gpointer user_data)
+{
+    if (MM_IS_AT_SERIAL_PORT (port)) {
+        /* Set RTS/CTS flow control by default */
+        g_object_set (G_OBJECT (port), MM_SERIAL_PORT_RTS_CTS, TRUE, NULL);
+    }
+}
 
 static void
 ports_organized (MMGenericCdma *cdma, MMAtSerialPort *port)
@@ -1456,7 +1512,9 @@ mm_modem_huawei_cdma_class_init (MMModemHuaweiCdmaClass *klass)
 
     mm_modem_huawei_cdma_parent_class = g_type_class_peek_parent (klass);
 
+    cdma_class->port_grabbed= port_grabbed;
     cdma_class->ports_organized = ports_organized;
     cdma_class->query_registration_state = query_registration_state;
+    cdma_class->post_enable = post_enable;
 }
 
