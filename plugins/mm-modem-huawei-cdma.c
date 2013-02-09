@@ -506,7 +506,7 @@ sms_send (MMModemCdmaSms *modem,
     }
 
     /* Use 'text' mode */
-    mm_at_serial_port_queue_command (port, "AT+CMGF=1", 3, NULL, NULL);
+    mm_at_serial_port_queue_command (port, "+CMGF=1", 3, NULL, NULL);
 
     if(!g_utf8_validate (text, -1, NULL)) {
         info->error = g_error_new (MM_MODEM_ERROR,
@@ -522,7 +522,7 @@ sms_send (MMModemCdmaSms *modem,
     if (len0 == len1) { /* ascii */
         gsize l0 = 0, l1 = 0;
 
-        mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,1,0", 3, NULL, NULL);
+        mm_at_serial_port_queue_command (port, "^HSMSSS=0,0,1,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
         /* Max length 160 */
@@ -535,7 +535,7 @@ sms_send (MMModemCdmaSms *modem,
         gsize l0 = 0, l1 = 0;
         gchar *p = NULL;
 
-        mm_at_serial_port_queue_command (port, "AT^HSMSSS=0,0,6,0", 3, NULL, NULL);
+        mm_at_serial_port_queue_command (port, "^HSMSSS=0,0,6,0", 3, NULL, NULL);
 
         l1 = snprintf (command, 256, "^HCMGS=\"%s\"\r", number);
         p = g_convert (text, len0, "UCS-2BE", "UTF8", NULL, &l0, &info->error);
@@ -700,6 +700,7 @@ sms_get (MMModemCdmaSms *modem,
 
     command = g_strdup_printf ("^HCMGR=%d\r\n", idx);
     mm_at_serial_port_queue_command (port, command, 10, sms_get_done, info);
+    g_free (command);
 }
 
 static void
@@ -741,6 +742,7 @@ sms_delete (MMModemCdmaSms *modem,
 
     command = g_strdup_printf ("+CMGD=%d\r\n", idx);
     mm_at_serial_port_queue_command (port, command, 10, sms_delete_done, info);
+    g_free (command);
 }
 
 static void
@@ -831,7 +833,6 @@ sms_list (MMModemCdmaSms *modem,
           gpointer user_data)
 {
     MMCallbackInfo *info;
-    char *command;
     MMAtSerialPort *port;
 
     info = mm_callback_info_new_full (MM_MODEM (modem),
@@ -845,8 +846,7 @@ sms_list (MMModemCdmaSms *modem,
         return;
     }
 
-    command = g_strdup_printf ("^HCMGL=4\r\n");
-    mm_at_serial_port_queue_command (port, command, 10, sms_list_done, info);
+    mm_at_serial_port_queue_command (port, "^HCMGL=4", 10, sms_list_done, info);
 }
 
 /*****************************************************************************/
@@ -888,8 +888,9 @@ phone_call (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("+CDV%s\r\n", number);
+    command = g_strdup_printf ("+CDV%s", number);
     mm_at_serial_port_queue_command (port, command, 10, phone_call_done, info);
+    g_free (command);
 }
 
 static void
@@ -917,7 +918,6 @@ phone_answer (MMModemCdmaPhone *modem,
                   gpointer user_data)
 {
     MMCallbackInfo *info;
-    char *command;
     MMAtSerialPort *port;
 
     info = mm_callback_info_new (MM_MODEM (modem), callback, user_data);
@@ -928,8 +928,7 @@ phone_answer (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("A\r\n");
-    mm_at_serial_port_queue_command (port, command, 10, phone_answer_done, info);
+    mm_at_serial_port_queue_command (port, "A", 10, phone_answer_done, info);
 }
 
 static void
@@ -957,7 +956,6 @@ phone_end (MMModemCdmaPhone *modem,
                     gpointer user_data)
 {
     MMCallbackInfo *info;
-    char *command;
     MMAtSerialPort *port;
 
     info = mm_callback_info_new (MM_MODEM (modem), callback, user_data);
@@ -968,8 +966,7 @@ phone_end (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("+CHV\r\n");
-    mm_at_serial_port_queue_command (port, command, 10, phone_end_done, info);
+    mm_at_serial_port_queue_command (port, "+CHV", 10, phone_end_done, info);
 }
 
 static void
@@ -1010,8 +1007,9 @@ phone_send_dtmf (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("^DTMF=%d,%s\r\n", id, digit);
+    command = g_strdup_printf ("^DTMF=%d,%s", id, digit);
     mm_at_serial_port_queue_command (port, command, 10, phone_send_dtmf_done, info);
+    g_free (command);
 }
 
 static void
@@ -1149,7 +1147,7 @@ phone_get_status (MMModemCdmaPhone *modem,
         return;
     }
 
-    mm_at_serial_port_queue_command (port, "+CLCC\r\n", 10, phone_get_status_done, info);
+    mm_at_serial_port_queue_command (port, "+CLCC", 10, phone_get_status_done, info);
 }
 
 static void
@@ -1189,8 +1187,9 @@ phone_mute (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("+CMUT=%u\r\n", mute?1:0);
+    command = g_strdup_printf ("+CMUT=%u", mute?1:0);
     mm_at_serial_port_queue_command (port, command, 10, phone_mute_done, info);
+    g_free (command);
 }
 
 static void
@@ -1230,8 +1229,9 @@ phone_clvl (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("+CLVL=%u\r\n", level);
+    command = g_strdup_printf ("+CLVL=%u", level);
     mm_at_serial_port_queue_command (port, command, 10, phone_clvl_done, info);
+    g_free (command);
 }
 
 static void
@@ -1271,8 +1271,9 @@ phone_cmiclvl (MMModemCdmaPhone *modem,
         return;
     }
 
-    command = g_strdup_printf ("^CMICLVL=%u\r\n", level);
+    command = g_strdup_printf ("^CMICLVL=%u", level);
     mm_at_serial_port_queue_command (port, command, 10, phone_cmiclvl_done, info);
+    g_free (command);
 }
 
 /*****************************************************************************/
